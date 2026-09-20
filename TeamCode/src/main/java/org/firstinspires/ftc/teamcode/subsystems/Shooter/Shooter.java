@@ -27,12 +27,12 @@ public class Shooter {
     private final PIDController shooterPID =
             new PIDController(KP, KI, KD);
 
-    public static float GATE_CLOSED = 0.31f;
-    public static float GATE_OPEN = 0.61f;
+    public static float GATE_CLOSED = 0;
+    public static float GATE_OPEN = 0;
 
     public static double TICKS_PER_REV = 28.0;
 
-    public static double RPM_TOLERANCE = 75.0;
+    public static double RPM_TOLERANCE = 0;
 
 
     public Shooter(Motor motor1, Motor motor2, Motor encoder,
