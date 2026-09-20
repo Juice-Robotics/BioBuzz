@@ -95,7 +95,7 @@ public class Shooter {
     public void refreshRPM() {
 
         currentRPM =
-                -encoder.motor.getVelocity()
+                encoder.motor.getVelocity()
                         * 60.0
                         / TICKS_PER_REV;
     }
