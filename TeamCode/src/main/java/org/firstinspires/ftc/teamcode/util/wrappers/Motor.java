@@ -16,7 +16,7 @@ public class Motor extends Component {
         this.power = 0;
         motor = map.get(DcMotorEx.class, name);
 
-        if(reverse){
+        if(reverse) {
             motor.setDirection(DcMotor.Direction.REVERSE);
         }
 
