@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.intake;
+package org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
