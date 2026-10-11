@@ -5,6 +5,8 @@ import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -199,6 +201,27 @@ public class Robot {
         frontRight.setPower((float) powerFrontRight);
         backLeft.setPower(-(float) powerBackLeft);
         backRight.setPower(-(float) powerBackRight);
+    }
+
+    public void turnToGoal(Pose2d robotPose, Vector2d targetPosition){
+        double dx = targetPosition.x - robotPose.position.x;
+        double dy = targetPosition.y - robotPose.position.y;
+
+        double targetHeading = Math.atan2(dy, dx);
+
+        double currentHeading = robotPose.heading.toDouble();
+
+        double error = targetHeading - currentHeading;
+        error = Math.atan2(Math.sin(error), Math.cos(error));
+
+        double adjustedHeading = currentHeading + error;
+
+        setDrivePowerConstHeading(
+                0,
+                0,
+                adjustedHeading,
+                currentHeading
+        );
     }
 
     public Action startIntakeAndTransfer() {
