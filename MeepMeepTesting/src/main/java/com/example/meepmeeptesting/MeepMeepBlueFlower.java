@@ -15,13 +15,21 @@ public class MeepMeepBlueFlower {
 
     public static void blueFlowerPath(){
 
-        blueFlowerBot.runAction(blueFlowerBot.getDrive().actionBuilder(new Pose2d(-40,60.5, Math.toRadians(135)))
-
-                .strafeTo(new Vector2d(-43, 31))
-                .waitSeconds(1.0)
+        blueFlowerBot.runAction(blueFlowerBot.getDrive().actionBuilder(new Pose2d(-40,63, Math.toRadians(90)))
+                .setReversed(true)
                 .splineTo(
-                        new Vector2d(-62, 62),
-                        Math.toRadians(130)
+                        new Vector2d(-43, 31),
+                        Math.toRadians(315)
+                )
+                .waitSeconds(1.0)
+                .setReversed(false)
+                .splineTo(
+                        new Vector2d(-60, 47),
+                        Math.toRadians(150)
+                )
+                .splineTo(
+                        new Vector2d(-64, 61),
+                        Math.toRadians(100)
                 )
                 .waitSeconds(1.0)
                 .setReversed(true)
@@ -52,7 +60,7 @@ public class MeepMeepBlueFlower {
                 .waitSeconds(1.0)
                 .setTangent(Math.toRadians(30))
                 .splineToLinearHeading(
-                        new Pose2d(19, 58, Math.toRadians(75)),
+                        new Pose2d(23, 58, Math.toRadians(75)),
                         Math.toRadians(30)
                 )
                 .build());
