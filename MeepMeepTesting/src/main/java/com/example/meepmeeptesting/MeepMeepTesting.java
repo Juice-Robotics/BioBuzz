@@ -27,6 +27,8 @@ public class MeepMeepTesting {
     public static void main(String[] args) throws IOException {
 
         MeepMeepCloseBlue.closeBluePath();
+        MeepMeepBlueGarden.blueGardenPath();
+        MeepMeepBlueFlower.blueFlowerPath();
 
         Image bioBuzzField = ImageIO.read(
                 Objects.requireNonNull(
@@ -39,7 +41,9 @@ public class MeepMeepTesting {
         meepMeep.setBackground(bioBuzzField)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(MeepMeepCloseBlue.closeBlueBot)
+//                .addEntity(MeepMeepCloseBlue.closeBlueBot)
+                .addEntity(MeepMeepBlueFlower.blueFlowerBot)
+//                .addEntity(MeepMeepBlueGarden.blueGardenBot)
                 .start();
     }
     }
