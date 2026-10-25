@@ -12,6 +12,7 @@ public class Shooter {
     public Motor motor2;
     public Motor encoder;
     public StepperServo gate;
+    public StepperServo hood;
 
     private boolean shooterEnabled = false;
     private boolean gateOpen = false;
@@ -36,12 +37,13 @@ public class Shooter {
 
 
     public Shooter(Motor motor1, Motor motor2, Motor encoder,
-                   StepperServo gate) {
+                   StepperServo gate, StepperServo hood) {
 
         this.motor1 = motor1;
         this.motor2 = motor2;
         this.encoder = encoder;
         this.gate = gate;
+        this.hood = hood;
 
         motor1.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor2.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -126,6 +128,7 @@ public class Shooter {
         gate.setPosition(GATE_OPEN);
         gateOpen = true;
     }
+    public
 
     public boolean isGateOpen() {
         return gateOpen;

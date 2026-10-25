@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -17,25 +18,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
-import org.firstinspires.ftc.teamcode.actions.CancelableAction;
-import org.firstinspires.ftc.teamcode.actions.SmartEmptyMag;
-import org.firstinspires.ftc.teamcode.actions.WaitUntilBB;
-import org.firstinspires.ftc.teamcode.actions.WaitUntilEmptyBB;
-import org.firstinspires.ftc.teamcode.actions.WaitUntilThird;
-import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.transfer.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.shooter.Flywheel;
-import org.firstinspires.ftc.teamcode.subsystems.shooter.Gate;
-import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood;
-import org.firstinspires.ftc.teamcode.subsystems.turret.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.Intake.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer.Transfer;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter.Shooter;
 
 import org.firstinspires.ftc.teamcode.util.enums.AllianceColor;
-import org.firstinspires.ftc.teamcode.util.hardware.Breakbeam;
-import org.firstinspires.ftc.teamcode.util.hardware.GoBildaLEDIndicator;
-import org.firstinspires.ftc.teamcode.util.helpers.AutoShoot;
-import org.firstinspires.ftc.teamcode.util.helpers.BallCounter;
-import org.firstinspires.ftc.teamcode.util.helpers.MatchStorage;
-import org.firstinspires.ftc.teamcode.util.models.ShotSolution;
+import org.firstinspires.ftc.teamcode.util.breakbeams.breakbeams;
 import org.firstinspires.ftc.teamcode.util.wrappers.Motor;
 import org.firstinspires.ftc.teamcode.util.wrappers.StepperServo;
 
@@ -52,15 +40,12 @@ public class Robot {
 
     public Intake intake;
     public Transfer transfer;
-    public Flywheel flywheel;
-    public Gate gate;
-    public Hood hood;
-    public Turret turret;
+    public Shooter shooter;
+
 
     public GoBildaPinpointDriver pinpoint;
     public Limelight3A limelight3A;
-    public GoBildaLEDIndicator blinky;
-    public BallCounter counter;
+
 
     public PIDController headingPID;
     public final double hP = 0.01, hI = 0.00, hD = 0.0001, hF = 0.05;
@@ -100,35 +85,26 @@ public class Robot {
 
         limelight3A = hardwareMap.get(Limelight3A.class, "limelight");
         limelight3A.start();
+        limelight3A.getLatestResult().getFiducialResults();
+        LLResultTypes.FiducialResult a;
+        // a.getTargetPoseRobotSpace();
 
-        blinky = new GoBildaLEDIndicator(0, "blinky", map);
 
-        Breakbeam bb1 = new Breakbeam(0, "bb1", map);
-        Breakbeam bb2 = new Breakbeam(2, "bb2", map);
-        Breakbeam bb3 = new Breakbeam(4, "bb3", map);
-        counter = new BallCounter(bb1, bb2, bb3);
-
+        shooter = new Shooter(new Motor(2, "shooter1", map, false),
+                new Motor(2, "shooter2", map, false),
+                new Motor(2, "shooter1", map, false) ,
+                new StepperServo(1, "gate", map, "none"),
+                new StepperServo(1, "hood", map, "none"));
         intake = new Intake(new Motor(3, "intake", map, false));
         transfer = new Transfer(new Motor(2, "transfer", map, false));
 
         Motor fw1 = new Motor(3, "flywheel1", map, true);
         Motor fw2 = new Motor(0, "flywheel2", map, false);
-        flywheel = new Flywheel(fw1, fw2, null);
 
-        gate = new Gate(new StepperServo(0, "gate", map));
-        hood = new Hood(new StepperServo(1, "hood", map));
-
-        Motor turretMotor = new Motor(4, "turret", map, true);
-        AnalogInput turretEncoder = map.get(AnalogInput.class, "absTurretEncoder");
-        turret = new Turret(turretMotor, turretEncoder, null);
     }
 
     public void update() {
-        turret.update();
-        flywheel.update();
-        blinky.update();
         pinpoint.update();
-        counter.refresh();
     }
 
     public void updateAim() {
@@ -136,19 +112,7 @@ public class Robot {
         double velX = pinpoint.getVelX(DistanceUnit.INCH);
         double velY = pinpoint.getVelY(DistanceUnit.INCH);
 
-        virtualTarget = AutoShoot.calculateNormalizedVirtualTarget(
-                velX,
-                velY,
-                pinpoint.getHeadingVelocity(AngleUnit.RADIANS),
-                pose,
-                MatchStorage.getAllianceColor()
-        );
 
-        ShotSolution sol = AutoShoot.calculateShot(pose, virtualTarget, pinpoint.getHeadingVelocity(AngleUnit.RADIANS));
-
-        flywheel.setRPM(sol.flywheelSpeed);
-        turret.runToAngle(sol.turretAngle + turretManualOffset);
-        hood.runToPosition(sol.hoodAngle);
     }
 
     public void setDrivePower(double x, double y, double rx) {
@@ -206,13 +170,9 @@ public class Robot {
                 new InstantAction(() -> {
                     intaking = true;
                     gateState = true;
-                    gate.close();
                     intake.start();
                 }),
-                new WaitUntilBB(this),
-                new InstantAction(intake::eject),
                 new SleepAction(0.08),
-                new InstantAction(intake::stall),
                 new SleepAction(0.01),
                 new InstantAction(() -> intaking = false)
         );
@@ -223,16 +183,13 @@ public class Robot {
                 new InstantAction(() -> {
                     intaking = true;
                     gateState = true;
-                    gate.close();
                     intake.start();
-                    blinky.set(GoBildaLEDIndicator.Colors.BLUE, GoBildaLEDIndicator.Animation.SLOW_BLINK);
                 })
         );
     }
 
     public Action stopIntakeAndTransfer() {
         return new SequentialAction(
-                new InstantAction(intake::stall),
                 new SleepAction(0.01),
                 new InstantAction(() -> intaking = false)
         );
@@ -240,9 +197,7 @@ public class Robot {
 
     public Action hoodOffsetAction() {
         return new SequentialAction(
-                new WaitUntilThird(this),
                 new InstantAction(() -> {
-                    hood.offset = -0.12f;
                 })
         );
     }
@@ -251,36 +206,22 @@ public class Robot {
         boolean far;
 
         shooting = true;
-        if (MatchStorage.getAllianceColor() == AllianceColor.RED) {
-            far = Math.hypot((pose.getX(DistanceUnit.INCH) + 72), (72 - pose.getY(DistanceUnit.INCH))) >= 100;
-        } else {
-            far = Math.hypot((pose.getX(DistanceUnit.INCH) + 72), (pose.getY(DistanceUnit.INCH) + 72)) >= 100;
-        }
 
-        CancelableAction hoodOffset = new CancelableAction(hoodOffsetAction());
         return new SequentialAction(
                 new InstantAction(() -> {
                     gate.open();
                     timer.reset();
-                    if (far) {
-                        intake.setPower(0.9);
-                    } else {
-                        intake.setPower(1);
-                    }
+
+
+                    intake.setPower(1);
+
                 }),
                 new SleepAction(0.06),
-                far ? new ParallelAction(
-                        new SequentialAction(
-                                new SmartEmptyMag(this),
-                                new InstantAction(hoodOffset::cancel)),
-                        hoodOffset
-                ) : new SmartEmptyMag(this),
-                new InstantAction(() -> { hood.offset = 0; }),
                 new InstantAction(intake::start),
                 new SleepAction(0.5),
                 new InstantAction(() -> {
                     gateState = false;
-                    gate.close();
+                    shooter.closeGate();
                     time = timer.time();
                     shooting = false;
                     isFull = false;
@@ -290,23 +231,14 @@ public class Robot {
 
     public Action autonShootFar() {
         shooting = true;
-        CancelableAction hoodOffset = new CancelableAction(hoodOffsetAction());
         return new SequentialAction(
                 new InstantAction(() -> {
-                    gate.open();
+                    shooter.openGate();
                     timer.reset();
                     intake.setPower(0.75);
                 }),
                 new SleepAction(0.06),
-                new ParallelAction(
-                        new SequentialAction(
-                                new WaitUntilEmptyBB(this),
-                                new InstantAction(hoodOffset::cancel)),
-                        hoodOffset
-                ),
-                new InstantAction(() -> {
-                    hood.offset = 0;
-                }),
+                new WaitUntilEmptyBB(this),
                 new InstantAction(intake::start),
                 new SleepAction(0.05),
                 new InstantAction(() -> {
@@ -314,7 +246,6 @@ public class Robot {
                     gate.close();
                     time = timer.time();
                     shooting = false;
-                    blinky.setColor(GoBildaLEDIndicator.Colors.JOOS_ORANGE);
                 })
         );
     }
@@ -324,7 +255,7 @@ public class Robot {
         return new SequentialAction(
                 new InstantAction(() -> {
                     shooting = true;
-                    gate.open();
+                    shooter.openGate();
                     timer.reset();
                     intake.setPower(1);
                 }),

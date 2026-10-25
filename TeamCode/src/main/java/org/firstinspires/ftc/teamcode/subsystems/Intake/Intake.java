@@ -3,11 +3,12 @@ package org.firstinspires.ftc.teamcode.subsystems.Intake;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.util.wrappers.Motor;
+import org.firstinspires.ftc.teamcode.util.wrappers.StepperServo;
 
 public class Intake {
     public Motor motor;
-    public Servo leftWedge;
-    public Servo rightWedge;
+    public StepperServo leftWedge;
+    public StepperServo rightWedge;
 
 
     double intakePower = 1.0;
@@ -24,7 +25,7 @@ public class Intake {
     // State tracker: 0 = Off, 1 = Running
     int intakingState = 0;
 
-    public Intake(Motor m, Servo leftWedge, Servo rightWedge) {
+    public Intake(Motor m, StepperServo leftWedge, StepperServo rightWedge) {
         this.motor = m;
         this.leftWedge = leftWedge;
         this.rightWedge = rightWedge;
