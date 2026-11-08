@@ -90,16 +90,13 @@ public class Robot {
         // a.getTargetPoseRobotSpace();
 
 
-        shooter = new Shooter(new Motor(2, "shooter1", map, false),
-                new Motor(2, "shooter2", map, false),
-                new Motor(2, "shooter1", map, false) ,
-                new StepperServo(1, "gate", map, "none"),
-                new StepperServo(1, "hood", map, "none"));
+        shooter = new Shooter(new Motor(2, "flywheel1", map, false),
+                new Motor(2, "flywheel2", map, false),
+                new Motor(2, "flywheel1", map, false) ,
+                new StepperServo(1, "gate", map),
+                new StepperServo(1, "hood", map));
         intake = new Intake(new Motor(3, "intake", map, false));
-        transfer = new Transfer(new Motor(2, "transfer", map, false));
-
-        Motor fw1 = new Motor(3, "flywheel1", map, true);
-        Motor fw2 = new Motor(0, "flywheel2", map, false);
+       // transfer = new Transfer(new Motor(2, "transfer", map, false));
 
     }
 
@@ -209,7 +206,7 @@ public class Robot {
 
         return new SequentialAction(
                 new InstantAction(() -> {
-                    gate.open();
+                    shooter.openGate();
                     timer.reset();
 
 
@@ -217,7 +214,7 @@ public class Robot {
 
                 }),
                 new SleepAction(0.06),
-                new InstantAction(intake::start),
+                // new InstantAction(intake::start),
                 new SleepAction(0.5),
                 new InstantAction(() -> {
                     gateState = false;
@@ -229,46 +226,7 @@ public class Robot {
         );
     }
 
-    public Action autonShootFar() {
-        shooting = true;
-        return new SequentialAction(
-                new InstantAction(() -> {
-                    shooter.openGate();
-                    timer.reset();
-                    intake.setPower(0.75);
-                }),
-                new SleepAction(0.06),
-                new WaitUntilEmptyBB(this),
-                new InstantAction(intake::start),
-                new SleepAction(0.05),
-                new InstantAction(() -> {
-                    gateState = false;
-                    gate.close();
-                    time = timer.time();
-                    shooting = false;
-                })
-        );
-    }
 
-    public Action autonShootClose() {
-        shooting = true;
-        return new SequentialAction(
-                new InstantAction(() -> {
-                    shooting = true;
-                    shooter.openGate();
-                    timer.reset();
-                    intake.setPower(1);
-                }),
-                new SleepAction(0.06),
-                new WaitUntilEmptyBB(this),
-                new InstantAction(intake::start),
-                new SleepAction(0.2),
-                new InstantAction(() -> {
-                    gateState = false;
-                    gate.close();
-                    time = timer.time();
-                    shooting = false;
-                })
-        );
-    }
+
+
 }

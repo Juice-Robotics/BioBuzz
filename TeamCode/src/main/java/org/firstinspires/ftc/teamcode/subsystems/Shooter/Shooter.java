@@ -130,7 +130,7 @@ public class Shooter {
     }
     public
 
-    public boolean isGateOpen() {
+     boolean isGateOpen() {
         return gateOpen;
     }
 }
