@@ -30,6 +30,7 @@ import com.acmerobotics.roadrunner.ftc.LynxFirmware;
 import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -47,6 +48,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.messages.MecanumLocalizerInputs
 import org.firstinspires.ftc.teamcode.roadrunner.messages.PoseMessage;
 
 import java.lang.Math;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,13 +65,13 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = 0.001961040787099;
-        public double lateralInPerTick = 0.0013512217677402083;
-        public double trackWidthTicks = 5933.3420791560675;
+        public double inPerTick = 0.00199145334;
+        public double lateralInPerTick = 0.0013451521474294056;
+        public double trackWidthTicks = 5976.633123801561;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.3;
-        public double kV = 0.00023;
+        public double kS = 1.4797714575130732;
+        public double kV = 0.0002377043918561715;
         public double kA = 0.00009;
 
         // path profile parameters (in inches)
@@ -268,16 +270,15 @@ public final class MecanumDrive {
 //        rightBack = motors[2];
 //        rightFront = motors[3];
 //
-
-    /// /        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    /// /        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    /// /        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    /// /        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    /// /
-    /// /        // TODO: reverse motor directions if needed
-    /// /        //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-    /// /        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-    /// /        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+    ////        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    ////        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    ////        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    ////        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    ////
+    ////        // TODO: reverse motor directions if needed
+    ////        //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+    ////        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+    ////        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 //
 //        // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
 //        //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
@@ -290,6 +291,7 @@ public final class MecanumDrive {
 //
 //        FlightRecorder.write("MECANUM_PARAMS", PARAMS);
 //    }
+
     public void setDrivePowers(PoseVelocity2d powers) {
         MecanumKinematics.WheelVelocities<Time> wheelVels = new MecanumKinematics(1).inverse(
                 PoseVelocity2dDual.constant(powers, 1));
@@ -408,7 +410,6 @@ public final class MecanumDrive {
             c.strokePolyline(xPoints, yPoints);
         }
     }
-
     //action but it stays
     public final class FollowTrajectoryStayAction implements Action {
         public final TimeTrajectory timeTrajectory;
@@ -417,7 +418,7 @@ public final class MecanumDrive {
         private final double[] xPoints, yPoints;
 
         public FollowTrajectoryStayAction(TimeTrajectory t) {
-            canceledStay = false;
+            canceledStay=false;
             timeTrajectory = t;
 
             List<Double> disps = com.acmerobotics.roadrunner.Math.range(
@@ -457,6 +458,7 @@ public final class MecanumDrive {
             }
 
 
+
             PoseVelocity2dDual<Time> command = new HolonomicController(
                     PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
                     PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
@@ -476,12 +478,12 @@ public final class MecanumDrive {
             mecanumCommandWriter.write(new MecanumCommandMessage(
                     voltage, leftFrontPower, leftBackPower, rightBackPower, rightFrontPower
             ));
-            if (error.position.norm() < 3 && Math.abs(error.heading.toDouble()) < 0.5) {
+            if (error.position.norm() < 3 && Math.abs(error.heading.toDouble())<0.5){
                 leftFront.setPower(0);
                 leftBack.setPower(0);
                 rightBack.setPower(0);
                 rightFront.setPower(0);
-            } else {
+            }else {
                 leftFront.setPower(leftFrontPower);
                 leftBack.setPower(leftBackPower);
                 rightBack.setPower(rightBackPower);
@@ -609,9 +611,9 @@ public final class MecanumDrive {
             // kA = 0 intentionally for path following
             final MotorFeedforward feedforward = new MotorFeedforward(PARAMS.kS,
                     PARAMS.kV / PARAMS.inPerTick, 0);
-            double leftFrontPower = feedforward.compute(wheelVels.leftFront) / voltage;
-            double leftBackPower = feedforward.compute(wheelVels.leftBack) / voltage;
-            double rightBackPower = feedforward.compute(wheelVels.rightBack) / voltage;
+            double leftFrontPower  = feedforward.compute(wheelVels.leftFront)  / voltage;
+            double leftBackPower   = feedforward.compute(wheelVels.leftBack)   / voltage;
+            double rightBackPower  = feedforward.compute(wheelVels.rightBack)  / voltage;
             double rightFrontPower = feedforward.compute(wheelVels.rightFront) / voltage;
 
             mecanumCommandWriter.write(new MecanumCommandMessage(
@@ -774,7 +776,6 @@ public final class MecanumDrive {
                 defaultVelConstraint, defaultAccelConstraint
         );
     }
-
     public TrajectoryActionBuilder pathBuilder(Pose2d beginPose) {
         return new TrajectoryActionBuilder(
                 TurnAction::new,
@@ -820,12 +821,11 @@ public final class MecanumDrive {
                 defaultVelConstraint, defaultAccelConstraint
         );
     }
-
-    public void cancelStay() {
+    public void cancelStay(){
         canceledStay = true;
     }
-
-    public void cancelTrajectory() {
+    public void cancelTrajectory(){
         cancelledTrajectory = true;
     }
+
 }

@@ -6,41 +6,133 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class breakbeams {
 
-    private static final int CAPACITY = 4;
+    private final DigitalChannel front;
+    private final DigitalChannel back;
 
-    public DigitalChannel beam1, beam2, beam3, beam4;
+    private int ballCount = 0;
+    private static final boolean BLOCKED_STATE = false;
 
-    public breakbeams(HardwareMap map) {
-        beam1 = map.digitalChannel.get("beam1");
-        beam2 = map.digitalChannel.get("beam2");
-        beam3 = map.digitalChannel.get("beam3");
-        beam4 = map.digitalChannel.get("beam4");
+    private static final long DEBOUNCE_NS = 30_000_000L;
 
-        beam1.setMode(DigitalChannel.Mode.INPUT);
-        beam2.setMode(DigitalChannel.Mode.INPUT);
-        beam3.setMode(DigitalChannel.Mode.INPUT);
-        beam4.setMode(DigitalChannel.Mode.INPUT);
+    private boolean frontStable;
+    private boolean backStable;
+
+    private boolean frontRaw;
+    private boolean backRaw;
+
+    private long frontChangedAt;
+    private long backChangedAt;
+
+    private boolean frontSawBall = false;
+    private boolean backSawBall = false;
+
+    public breakbeams(HardwareMap hardwareMap) {
+
+        front = hardwareMap.get(
+                DigitalChannel.class, "frontBeam");
+
+        back = hardwareMap.get(
+                DigitalChannel.class, "backBeam");
+
+        front.setMode(DigitalChannel.Mode.INPUT);
+        back.setMode(DigitalChannel.Mode.INPUT);
+
+        frontRaw = isFrontBlocked();
+        backRaw = isBackBlocked();
+
+        frontStable = frontRaw;
+        backStable = backRaw;
+
+        long now = System.nanoTime();
+        frontChangedAt = now;
+        backChangedAt = now;
     }
 
-    public int getBalls() {
-        int count = 0;
-
-        if (!beam1.getState()) count++;
-        if (!beam2.getState()) count++;
-        if (!beam3.getState()) count++;
-        if (!beam4.getState()) count++;
-
-        return count;
+    private boolean isFrontBlocked() {
+        return front.getState() == BLOCKED_STATE;
     }
 
-    public boolean isFull() {
-        return getBalls() == CAPACITY;
-    }
-
-    public boolean isEmpty() {
-        return getBalls() == 0;
+    private boolean isBackBlocked() {
+        return back.getState() == BLOCKED_STATE;
     }
 
     public void update() {
+
+        long now = System.nanoTime();
+
+        boolean currentFront = isFrontBlocked();
+
+        if (currentFront != frontRaw) {
+            frontRaw = currentFront;
+            frontChangedAt = now;
+        }
+
+        if (frontStable != frontRaw &&
+                now - frontChangedAt >= DEBOUNCE_NS) {
+
+            frontStable = frontRaw;
+
+            if (frontStable) {
+                frontSawBall = true;
+            } else if (frontSawBall) {
+                ballCount = Math.min(4, ballCount + 1);
+                frontSawBall = false;
+            }
+        }
+
+        boolean currentBack = isBackBlocked();
+
+        if (currentBack != backRaw) {
+            backRaw = currentBack;
+            backChangedAt = now;
+        }
+
+        if (backStable != backRaw &&
+                now - backChangedAt >= DEBOUNCE_NS) {
+
+            backStable = backRaw;
+
+            if (backStable) {
+                backSawBall = true;
+            } else if (backSawBall) {
+                ballCount = Math.max(0, ballCount - 1);
+                backSawBall = false;
+            }
+        }
+    }
+
+    public int getBallCount() {
+        return ballCount;
+    }
+
+    public boolean isFull() {
+        return ballCount >= 4;
+    }
+
+    public boolean isEmpty() {
+        return ballCount == 0;
+    }
+
+    public boolean isFrontBlockedNow() {
+        return isFrontBlocked();
+    }
+
+    public boolean isBackBlockedNow() {
+        return isBackBlocked();
+    }
+
+    public void reset() {
+        ballCount = 0;
+        frontSawBall = false;
+        backSawBall = false;
+
+        frontRaw = isFrontBlocked();
+        backRaw = isBackBlocked();
+        frontStable = frontRaw;
+        backStable = backRaw;
+
+        long now = System.nanoTime();
+        frontChangedAt = now;
+        backChangedAt = now;
     }
 }
