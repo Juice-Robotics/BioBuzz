@@ -14,17 +14,16 @@ public class Shooter {
     public StepperServo gate;
     public StepperServo hood;
 
-    private boolean shooterEnabled = false;
+    private boolean shooterEnabled = true;
     private boolean gateOpen = false;
 
     public double targetRPM = 0;
     public double currentRPM = 0;
 
-    public static double KP = 0.0;
+    public static double KP = 0.0065;
     public static double KI = 0.0;
     public static double KD = 0.0;
-    public static double kF = 0.0;
-
+    public static double kF = 0.11;
     private final PIDController shooterPID =
             new PIDController(KP, KI, KD);
 
@@ -97,7 +96,7 @@ public class Shooter {
     public void refreshRPM() {
 
         currentRPM =
-                encoder.motor.getVelocity()
+                -encoder.motor.getVelocity()
                         * 60.0
                         / TICKS_PER_REV;
     }

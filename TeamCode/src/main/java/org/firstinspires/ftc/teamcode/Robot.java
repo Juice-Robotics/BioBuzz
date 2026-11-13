@@ -91,8 +91,7 @@ public class Robot {
 
 
         shooter = new Shooter(new Motor(2, "flywheel1", map, false),
-                new Motor(2, "flywheel2", map, false),
-                new Motor(2, "flywheel1", map, false) ,
+                new Motor(2, "flywheel2", map, false), backRight,
                 new StepperServo(1, "gate", map),
                 new StepperServo(1, "hood", map));
         intake = new Intake(new Motor(3, "intake", map, false));
@@ -208,6 +207,7 @@ public class Robot {
                 new InstantAction(() -> {
                     shooter.openGate();
                     timer.reset();
+                    shooter.setRPM(1000);
 
 
                     intake.setPower(1);

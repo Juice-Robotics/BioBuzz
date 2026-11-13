@@ -34,6 +34,8 @@ public class VeloPIDTuner extends OpMode{
     private Servo kicker;
 
     private DcMotorEx intake;
+
+    private DcMotorEx encoder;
     private com.qualcomm.robotcore.hardware.CRServo transfer1;
     private com.qualcomm.robotcore.hardware.CRServo transfer2;
 
@@ -68,6 +70,8 @@ public class VeloPIDTuner extends OpMode{
 
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        encoder = hardwareMap.get(DcMotorEx.class, "rightBack");
+
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -96,12 +100,12 @@ public class VeloPIDTuner extends OpMode{
         oldSquare = gamepad1.square;
 
         controller1.setPID(p, i, d);
-        double slides1Pos = motor1.getVelocity();
+        double slides1Pos = -(encoder.getVelocity());
         telemetry.addData("pos ", slides1Pos);
         if (targetRPM > 0){
-            shooter1Speed = controller1.calculate(motor1.getVelocity(), targetRPM) + f;
+            shooter1Speed = controller1.calculate(-encoder.getVelocity(), targetRPM) + f;
         } else {
-            shooter1Speed = controller1.calculate(motor1.getVelocity(), targetRPM) ;
+            shooter1Speed = controller1.calculate(-encoder.getVelocity(), targetRPM) ;
         }
 
         telemetry.addData("pow ", shooter1Speed);

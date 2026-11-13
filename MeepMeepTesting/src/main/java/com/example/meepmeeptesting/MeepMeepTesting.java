@@ -29,6 +29,7 @@ public class MeepMeepTesting {
         MeepMeepCloseBlue.closeBluePath();
         MeepMeepBlueGarden.blueGardenPath();
         MeepMeepBlueFlower.blueFlowerPath();
+        MeepMeepBlueGardenKavin.kavinBlueGardenPath();
 
         Image bioBuzzField = ImageIO.read(
                 Objects.requireNonNull(
@@ -42,8 +43,9 @@ public class MeepMeepTesting {
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
 //                .addEntity(MeepMeepCloseBlue.closeBlueBot)
-                .addEntity(MeepMeepBlueFlower.blueFlowerBot)
-//                .addEntity(MeepMeepBlueGarden.blueGardenBot)
+               // .addEntity(MeepMeepBlueFlower.blueFlowerBot)
+           .addEntity(MeepMeepBlueGardenKavin.meepmeepblueGardenBot)
+          //   .addEntity(MeepMeepBlueGarden.blueGardenBot)
                 .start();
     }
     }

@@ -83,6 +83,8 @@ public class MAIN extends LinearOpMode {
             oldTime = newTime;
 
             telemetry.addData("LOOPTIME: ", frequency);
+            telemetry.addData("target rpm", robot.shooter.targetRPM);
+            telemetry.addData("Shooter rpm", robot.shooter.currentRPM);
             telemetry.update();
         }
     }
