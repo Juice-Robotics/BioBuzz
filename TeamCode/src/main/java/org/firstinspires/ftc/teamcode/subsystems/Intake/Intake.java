@@ -44,6 +44,11 @@ public class Intake {
         intakingState = 1;
     }
 
+    public void stall(){
+        setPower(0.55);
+        intakingState = 0;
+    }
+
     public void reverse() {
         setPower(-1.0);
         intakingState = 1;
