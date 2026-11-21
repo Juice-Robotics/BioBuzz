@@ -92,7 +92,7 @@ public class Robot {
         // a.getTargetPoseRobotSpace();
 
 
-        shooter = new Shooter(new Motor(2, "flywheel1", map, false),
+        shooter = new Shooter(new Motor(2, "flywheel1", map, true),
                 new Motor(2, "flywheel2", map, false), backRight,
                 new StepperServo(1, "gate", map),
                 new StepperServo(1, "hood", map));
@@ -104,13 +104,19 @@ public class Robot {
     public void update() {
         pinpoint.update();
     }
-
+    public Action update(boolean action) {
+        return new InstantAction(()->{
+        shooter.update();
+        pinpoint.update();
+        pose = pinpoint.getPosition();
+        double velX = pinpoint.getVelX(DistanceUnit.INCH);
+        double velY = pinpoint.getVelY(DistanceUnit.INCH);}
+        );
+    }
     public void updateAim() {
         pose = pinpoint.getPosition();
         double velX = pinpoint.getVelX(DistanceUnit.INCH);
         double velY = pinpoint.getVelY(DistanceUnit.INCH);
-
-
     }
 
     public void setDrivePower(double x, double y, double rx) {
@@ -201,26 +207,17 @@ public class Robot {
     }
 
     public Action shootingAction() {
-        boolean far;
-
         shooting = true;
 
         return new SequentialAction(
                 new InstantAction(() -> {
-                    shooter.openGate();
                     timer.reset();
                     shooter.setRPM(1000);
-
-
                     intake.setPower(1);
-
                 }),
                 new SleepAction(0.06),
-                // new InstantAction(intake::start),
                 new SleepAction(0.5),
                 new InstantAction(() -> {
-                    gateState = false;
-                    shooter.closeGate();
                     time = timer.time();
                     shooting = false;
                     isFull = false;
