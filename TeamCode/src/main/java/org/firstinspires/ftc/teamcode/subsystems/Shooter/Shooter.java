@@ -27,8 +27,8 @@ public class Shooter {
     private final PIDController shooterPID =
             new PIDController(KP, KI, KD);
 
-    public static float GATE_CLOSED = 0;
-    public static float GATE_OPEN = 0;
+    public static float GATE_CLOSED = 0.31f;
+    public static float GATE_OPEN = 0.61f;
 
     public static double TICKS_PER_REV = 28.0;
 
@@ -69,8 +69,10 @@ public class Shooter {
 
         shooterPower = Math.max(-1.0, Math.min(1.0, shooterPower));
 
-        motor1.setPower(shooterPower);
-        motor2.setPower(shooterPower);
+       motor1.setPower(shooterPower);
+       motor2.setPower(shooterPower);
+       // motor1.motor.setPower(0.5);
+       // motor2.motor.setPower(0.5);
     }
 
     public void setRPM(double rpm) {
