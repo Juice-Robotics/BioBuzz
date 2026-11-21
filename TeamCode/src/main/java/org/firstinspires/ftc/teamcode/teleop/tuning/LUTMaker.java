@@ -23,9 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@TeleOp(name = "r")
+@TeleOp(name = "lutmaker")
 @Config
-@Disabled
 public class LUTMaker extends LinearOpMode {
     double oldTime = 0;
     boolean oldRTrigger = false;
