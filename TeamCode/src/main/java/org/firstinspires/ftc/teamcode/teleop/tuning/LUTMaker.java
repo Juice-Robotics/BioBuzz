@@ -1,8 +1,6 @@
 
 package org.firstinspires.ftc.teamcode.teleop.tuning;
 
-import static org.firstinspires.ftc.teamcode.teleop.tuning.PresetTuner.vTarget;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -65,7 +63,7 @@ public class LUTMaker extends OpMode{
         double distance = Math.hypot(dx, dy);
 
         if (gamepad1.leftBumperWasPressed() && !robot.shooting) {
-            actionsQueue.add(robot.shootingAction());
+            actionsQueue.add(robot.shootingAction(flywheelSpeed));
         }
         if (gamepad1.crossWasPressed()) {
             if (robot.intaking) {
@@ -90,7 +88,7 @@ public class LUTMaker extends OpMode{
         actionsQueue = newActions;
 
         telemetry.addData("dist", distance);
-        telemetry.addData("flywheel target ", vTarget);
+        telemetry.addData("flywheel target ", flywheelSpeed);
         telemetry.update();
     }
 }
