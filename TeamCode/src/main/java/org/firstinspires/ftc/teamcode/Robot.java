@@ -102,7 +102,11 @@ public class Robot {
     }
 
     public void update() {
+        shooter.update();
         pinpoint.update();
+        pose = pinpoint.getPosition();
+        double velX = pinpoint.getVelX(DistanceUnit.INCH);
+        double velY = pinpoint.getVelY(DistanceUnit.INCH);
     }
     public Action update(boolean action) {
         return new InstantAction(()->{
@@ -206,13 +210,13 @@ public class Robot {
         );
     }
 
-    public Action shootingAction() {
+    public Action shootingAction(double rpm) {
         shooting = true;
 
         return new SequentialAction(
                 new InstantAction(() -> {
                     timer.reset();
-                    shooter.setRPM(1000);
+                    shooter.setRPM(rpm);
                     intake.setPower(1);
                 }),
                 new SleepAction(0.06),
