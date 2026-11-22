@@ -63,6 +63,10 @@ public class VeloPIDTuner extends OpMode{
         motor1 = hardwareMap.get(DcMotorEx.class, "flywheel1");
         motor2 = hardwareMap.get(DcMotorEx.class, "flywheel2");
 
+        motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -71,6 +75,7 @@ public class VeloPIDTuner extends OpMode{
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         encoder = hardwareMap.get(DcMotorEx.class, "rightBack");
+        encoder.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setDirection(DcMotorSimple.Direction.REVERSE);

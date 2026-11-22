@@ -53,7 +53,7 @@ public class MAIN extends LinearOpMode {
 
             TelemetryPacket packet = new TelemetryPacket();
 
-            actionsQueue.add(robot.update(true));
+            robot.update();
 
             if (gamepad1.leftBumperWasPressed()) {
                 if (!robot.shooting) {
