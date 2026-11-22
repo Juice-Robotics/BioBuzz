@@ -53,11 +53,11 @@ public class MAIN extends LinearOpMode {
 
             TelemetryPacket packet = new TelemetryPacket();
 
-            actionsQueue.add(robot.update(true));
+            robot.update();
 
             if (gamepad1.leftBumperWasPressed()) {
                 if (!robot.shooting) {
-                    actionsQueue.add(robot.shootingAction());
+                    actionsQueue.add(robot.shootingAction(1000));
                 }
             }
 
@@ -91,7 +91,7 @@ public class MAIN extends LinearOpMode {
 
             telemetry.addData("LOOPTIME: ", frequency);
             telemetry.addData("target rpm", robot.shooter.targetRPM);
-            telemetry.addData("Shooter rpm", robot.shooter.currentRPM);
+            telemetry.addData("Shooter rpm", robot.shooter.getRPM());
             telemetry.addData("Shooter Enabled", robot.shooter.isEnabled());
             telemetry.addData("Flywheel 1 Power", robot.shooter.motor1.motor.getPower());
             telemetry.addData("Flywheel 2 Power", robot.shooter.motor2.motor.getPower());

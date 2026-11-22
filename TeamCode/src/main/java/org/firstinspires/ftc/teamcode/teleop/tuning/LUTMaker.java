@@ -30,13 +30,13 @@ public class LUTMaker extends LinearOpMode {
     boolean oldRTrigger = false;
     boolean oldLTrigger = false;
     public static double flywheelRPM;
-    public static double hoodAngle;
+    public static float hoodAngle;
     @Override
     public void runOpMode() throws InterruptedException {
         FtcDashboard dash = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
         Robot robot = new Robot(hardwareMap, false);
-
+        robot.pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, -24, 0, AngleUnit.DEGREES, 0));
 
         List<Action> actionsQueue = new ArrayList<>();
 
@@ -56,7 +56,7 @@ public class LUTMaker extends LinearOpMode {
 
 
             if (gamepad1.leftBumperWasPressed() && !robot.shooting) {
-                actionsQueue.add(robot.shootingAction());
+                actionsQueue.add(robot.shootingAction(flywheelRPM));
             }
 
             if (gamepad1.rightBumperWasPressed() && !robot.shooting && !robot.intaking) {
@@ -80,6 +80,7 @@ public class LUTMaker extends LinearOpMode {
             }
             robot.pinpoint.update();
             robot.shooter.update();
+            robot.shooter.hood.setPosition(hoodAngle);
 
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;
@@ -106,7 +107,7 @@ public class LUTMaker extends LinearOpMode {
             telemetry.addData("gate", robot.gateState);
             telemetry.addData("CycleTime", Robot.time);
             Pose2D pose = robot.pinpoint.getPosition();
-            Pose2D tPose = new Pose2D(DistanceUnit.INCH, -60, 60, AngleUnit.RADIANS, 0);
+            Pose2D tPose = new Pose2D(DistanceUnit.INCH, -14.25, -16, AngleUnit.RADIANS, 0);
             double dx = tPose.getX(DistanceUnit.INCH) - pose.getX(DistanceUnit.INCH);
             double dy = tPose.getY(DistanceUnit.INCH) - pose.getY(DistanceUnit.INCH);
 
@@ -114,6 +115,7 @@ public class LUTMaker extends LinearOpMode {
             telemetry.addData("dx", dx);
             telemetry.addData("dy", dy);
             telemetry.addData("dist", distance);
+            telemetry.addData("shooterRPM", robot.shooter.getRPM());
 
 //            telemetry.addData("offset", robot.turretManualOffset);
 
