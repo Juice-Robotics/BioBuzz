@@ -44,12 +44,14 @@ public class LUTMaker extends OpMode{
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         robot = new Robot(hardwareMap, false);
+
     }
 
     @Override
     public void loop() {
         TelemetryPacket packet = new TelemetryPacket();
         robot.shooter.hood.setPosition(HOOD_POS);
+        robot.shooter.openGate();
 
         double flywheelRPM = robot.shooter.encoder.motor.getVelocity() * 60 / 28;
         telemetry.addData("vPos ", flywheelRPM);
@@ -65,6 +67,7 @@ public class LUTMaker extends OpMode{
         if (gamepad1.leftBumperWasPressed() && !robot.shooting) {
             actionsQueue.add(robot.shootingAction(flywheelSpeed));
         }
+
         if (gamepad1.crossWasPressed()) {
             if (robot.intaking) {
                 actionsQueue.add(robot.stopIntakeAndTransfer());
